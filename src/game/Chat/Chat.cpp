@@ -271,6 +271,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "factionchange_items", SEC_ADMINISTRATOR, true, &ChatHandler::HandleFactionChangeItemsCommand,    "", nullptr },
         { NODE, "loottable",      SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugLootTableCommand,           "", nullptr },
         { NODE, "utf8overflow", SEC_ADMINISTRATOR,    true, &ChatHandler::HandleDebugOverflowCommand, "", nullptr },
+        { NODE, "chatfreeze", SEC_ADMINISTRATOR,    true, &ChatHandler::HandleDebugChatFreezeCommand, "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                                "", nullptr }
     };
 
@@ -540,6 +541,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "name",           SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcNameCommand,             "", nullptr },
         { NODE, "subname",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcSubNameCommand,          "", nullptr },
         //}
+        { NODE, "reset",        SEC_BASIC_ADMIN,      false, &ChatHandler::HandleNpcResetCommand,            "", nullptr },
 
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
@@ -1918,7 +1920,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
             break;
 
         char commandChar;
-        reader >> commandChar;
+        reader >> std::noskipws >> commandChar;
 
         // | in normal messages is escaped by ||
         if (commandChar != '|')

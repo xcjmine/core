@@ -4408,6 +4408,23 @@ bool ChatHandler::HandleNpcPlayEmoteCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleNpcResetCommand(char* args)
+{
+    auto target = getSelectedCreature();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->DoKillUnit();
+    target->Respawn();
+    target->AIM_Initialize();
+
+    return true;
+}
+
 //TODO: NpcCommands that needs to be fixed :
 
 bool ChatHandler::HandleNpcAddWeaponCommand(char* /*args*/)
@@ -4992,7 +5009,6 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
         player->SetShapeshiftForm(FORM_NONE);
 
     player->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
-    player->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
 
     player->setFactionForRace(player->getRace());
 
@@ -5001,6 +5017,11 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     // reset only if player not in some form;
     if (player->GetShapeshiftForm() == FORM_NONE)
         player->InitPlayerDisplayIds();
+
+    if (player->getRace() == RACE_TAUREN && player->GetDisplayId() == player->GetNativeDisplayId())
+        player->SetFloatValue(UNIT_FIELD_COMBATREACH, 4.05f);
+    else
+        player->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
 
     // is it need, only in pre-2.x used and field byte removed later?
     if (powertype == POWER_RAGE || powertype == POWER_MANA)
